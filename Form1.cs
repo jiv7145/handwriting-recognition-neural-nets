@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Numpy;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -66,6 +67,32 @@ namespace WindowsFormsApp3 {
         }
 
         
+    }
+
+
+
+    class Network {
+        int num_layers;
+        int[] sizes;
+        List<NDarray> biases;
+        List<NDarray> weights;
+
+        public Network(int[] sizes) {
+            biases = new List<NDarray>();
+            weights = new List<NDarray>();
+            this.sizes = sizes;
+            num_layers = sizes.Length;
+
+            for (int i = 1; i < sizes.Length; i++) {
+                biases.Add(Numpy.np.random.randn(new int[] { sizes[i], 1 }));
+                weights.Add(Numpy.np.random.randn(new int[] { sizes[i - 1], sizes[i] }));
+            }
+            Console.WriteLine(weights);
+        }
+
+
+
+
     }
 
 
