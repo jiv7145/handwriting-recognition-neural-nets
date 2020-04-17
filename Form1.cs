@@ -76,6 +76,7 @@ namespace WindowsFormsApp3 {
         int[] sizes;
         List<NDarray> biases;
         List<NDarray> weights;
+        int n;
 
         public Network(int[] sizes) {
             biases = new List<NDarray>();
