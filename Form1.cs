@@ -11,12 +11,15 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApp3 {
     public partial class Form1: Form {
+        //------UI Elements----
         Graphics g;
         bool moving = false;
         Pen pen;
         int x = -1;
         int y = -1;
         Bitmap image;
+        //---------------------
+        
 
         public Form1() {
             InitializeComponent();
@@ -58,4 +61,7 @@ namespace WindowsFormsApp3 {
 
         
     }
+
+
+
 }
