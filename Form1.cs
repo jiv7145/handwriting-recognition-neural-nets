@@ -19,17 +19,22 @@ namespace WindowsFormsApp3 {
         int x = -1;
         int y = -1;
         Bitmap image;
-        //---------------------
-        
+        Graphics gr;
+        Bitmap bmp;
+        List<int> imgValues = new List<int>(); //ARGB 32-bit values
+       //---------------------
+
 
         public Form1() {
             InitializeComponent();
             g = panel1.CreateGraphics();
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            pen = new Pen(Color.Black, 1);
+            pen = new Pen(Color.Black, (float) 1.5);
             pen.StartCap = pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
+            bmp = new Bitmap(28, 28);
 
+            gr = Graphics.FromImage(bmp);
             Network net = new Network(new int[] { 784, 30, 10});
 
             Loader ld = new Loader();
@@ -45,11 +50,23 @@ namespace WindowsFormsApp3 {
             x = -1;
             y = -1;
             panel1.Cursor = Cursors.Default;
+
+            imgValues.Clear();
+            for (int i = 0; i < bmp.Width; i++) {
+                for (int j = 0; j < bmp.Height; j++) {
+                    int pixel = bmp.GetPixel(i, j).ToArgb();
+                    imgValues.Add(pixel);
+                }
+            }
+
+            panel1.Image = bmp;
+            panel1.Image.Save("./temp.bmp");
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e) {
             if (moving && x != -1 && y != -1) {
                 g.DrawLine(pen, new Point(x, y), e.Location);
+                gr.DrawLine(pen, new Point(x, y), e.Location);
                 x = e.X;
                 y = e.Y;
             }
