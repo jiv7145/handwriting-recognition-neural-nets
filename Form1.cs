@@ -24,6 +24,12 @@ namespace WindowsFormsApp3 {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             pen = new Pen(Color.Black, 1);
             pen.StartCap = pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+
+            
+            Loader ld = new Loader();
+            ld.load_data("../../pickledata.pkl.npy");
+
+           
         }
 
         private void panel1_MouseUp(object sender, MouseEventArgs e) {
