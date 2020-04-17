@@ -29,9 +29,13 @@ namespace WindowsFormsApp3 {
             pen = new Pen(Color.Black, 1);
             pen.StartCap = pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
-            
+
+            Network net = new Network(new int[] { 784, 30, 10});
+
             Loader ld = new Loader();
-            ld.load_data("../../pickledata.pkl.npy");
+            List<List<Tuple<NDarray, NDarray>>> all_data = ld.load_data("../../pickledata.pkl.npy");
+
+            net.SGD(all_data[0], 30, 10, 10, 3.0, all_data[2]);
 
            
         }
@@ -71,30 +75,7 @@ namespace WindowsFormsApp3 {
 
 
 
-    class Network {
-        int num_layers;
-        int[] sizes;
-        List<NDarray> biases;
-        List<NDarray> weights;
-        int n;
-
-        public Network(int[] sizes) {
-            biases = new List<NDarray>();
-            weights = new List<NDarray>();
-            this.sizes = sizes;
-            num_layers = sizes.Length;
-
-            for (int i = 1; i < sizes.Length; i++) {
-                biases.Add(Numpy.np.random.randn(new int[] { sizes[i], 1 }));
-                weights.Add(Numpy.np.random.randn(new int[] { sizes[i - 1], sizes[i] }));
-            }
-            Console.WriteLine(weights);
-        }
-
-
-
-
-    }
+   
 
 
 
