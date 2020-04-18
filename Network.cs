@@ -122,7 +122,7 @@ namespace WindowsFormsApp3
                 Console.WriteLine("Activation Shape {0}", activation.shape);
                 Console.WriteLine("B shape {0}", b.shape);
                 NDarray z = np.dot(w, activation) + b;
-                Console.WriteLine(z.shape);
+                //Console.WriteLine(z.shape);
                
                 zs.Add(z);
                 activation = sigmoid(z);
@@ -130,17 +130,32 @@ namespace WindowsFormsApp3
                 activations.Add(activation);
             }
 
-            NDarray delta = cost_derivative(activations[activations.Count-1], y) * sigmoidPrime(zs[zs.Count-1]); // this works?
+           // Console.WriteLine("y shape: {0}", y.shape);
+            //Console.WriteLine("activation shape: {0}", activations[activations.Count - 1].shape);
+            y = np.reshape(y, new int[] { 10, 1 });
+           // NDarray delta1 = cost_derivative(activations[activations.Count - 1], y);
+            //Console.WriteLine("Delta1 shape {0}", delta1.shape);
+            //NDarray delta2 = sigmoidPrime(zs[zs.Count - 1]);
+            //Console.WriteLine("Delta2 shape {0}", delta2.shape);
+
+            NDarray delta = cost_derivative(activations[activations.Count-1], y) * sigmoidPrime(zs[zs.Count-1]);
+
+            //Console.WriteLine("Zs: {0}", zs[zs.Count - 1]);
 
             nabla_b[nabla_b.Count-1] = delta;
+           // Console.WriteLine("Z shape {0}", zs[zs.Count - 1].shape);
+           // Console.WriteLine("Delta shape {0}", delta.shape);
+           // Console.WriteLine("Transposed activations {0}", np.transpose(activations[activations.Count - 2]).shape);
             nabla_w[nabla_w.Count-1] = np.dot(delta, np.transpose(activations[activations.Count-2]));
 
             for (int l = 2; l < num_layers; l++) {
                 NDarray z = zs[zs.Count-l];
                 NDarray sp = sigmoidPrime(z);
-                delta = np.dot(weights[weights.Count - l + 1].transpose(), delta) * sp;
+                delta = np.dot(np.transpose(weights[weights.Count - l + 1]), delta) * sp;
                 nabla_b[nabla_b.Count-l] = delta;
-                nabla_w[nabla_w.Count-l] = np.dot(delta, np.transpose(activations[activations.Count-l + 1]));
+               // Console.WriteLine("delta shape {0}", delta.shape);
+               // Console.WriteLine("tranposed activation shape {0}", np.transpose(np.reshape(activations[activations.Count - l - 1], new int[] {784, 1})).shape);
+                nabla_w[nabla_w.Count-l] = np.dot(delta, np.transpose(np.reshape(activations[activations.Count - l - 1], new int[] { 784, 1 })));
             }
             return (nabla_b, nabla_w);
         }
@@ -155,8 +170,8 @@ namespace WindowsFormsApp3
 
         private NDarray cost_derivative(NDarray output_activations, NDarray y) {
             //y = np.reshape(y, output_activations.shape);
-            Console.WriteLine(output_activations.shape);
-            Console.WriteLine(y.shape);
+            //Console.WriteLine(output_activations.shape);
+            //Console.WriteLine(y.shape);
             return (output_activations - y);
         }
 
