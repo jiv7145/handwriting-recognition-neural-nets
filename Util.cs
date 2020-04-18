@@ -10,27 +10,47 @@ namespace WindowsFormsApp3
     class Util
     {
 
-        public static List<Tuple<NDarray, NDarray>> zip(List<NDarray> darrays, NDarray ted1)
+        public static List<NDarray> zip(List<NDarray> darrays, NDarray ted1)
         {
+           
+            List<NDarray> data = new List<NDarray>();
+            int min = Math.Min(darrays.Count, ted1.size);
 
-            List<Tuple<NDarray, NDarray>> data = new List<Tuple<NDarray, NDarray>>();
-            for (int i = 0; i < darrays.Count; i++)
+            for (int i = 0; i < min; i++)
             {
-                data.Add(new Tuple<NDarray, NDarray>(darrays[i], ted1[i]));
+                List<NDarray> convert = new List<NDarray>();
+                convert.Add(darrays[i]);
+                convert.Add(ted1[i]);
+                NDarray converted = np.array(convert); // convert to ndarray of ndarrays
+                data.Add(converted);
             }
             return data;
         }
 
-        public static List<Tuple<NDarray, NDarray>> zip(List<NDarray> darrays, List<NDarray> ted1)
+        public static List<NDarray> zip(List<NDarray> darrays, List<NDarray> ted1)
         {
-            //Console.WriteLine(darrays.Count);
-            //Console.WriteLine(ted1.Count);
-            List<Tuple<NDarray, NDarray>> data = new List<Tuple<NDarray, NDarray>>();
-            for (int i = 0; i < darrays.Count; i++)
+
+            List<NDarray> data = new List<NDarray>();
+            int min = Math.Min(darrays.Count, ted1.Count);
+            int max = Math.Max(darrays.Count, ted1.Count);
+         
+            
+            for (int i = 0; i < min; i++)
             {
-                data.Add(new Tuple<NDarray, NDarray>(darrays[i], ted1[i]));
+                List<NDarray> convert = new List<NDarray>();
+               
+                convert.Add(np.ravel(darrays[i]));
+                convert.Add(np.ravel(ted1[i]));
+
+                NDarray converted = np.array(convert); // convert to ndarray of ndarrays          
+                data.Add(converted);
+
             }
             return data;
         }
+
+
+
     }
+
 }

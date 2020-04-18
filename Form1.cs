@@ -20,7 +20,7 @@ namespace WindowsFormsApp3 {
         int y = -1;
         Bitmap image;
         //---------------------
-        
+
 
         public Form1() {
             InitializeComponent();
@@ -29,13 +29,10 @@ namespace WindowsFormsApp3 {
             pen = new Pen(Color.Black, 1);
             pen.StartCap = pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
-
             Network net = new Network(new int[] { 784, 30, 10});
-
             Loader ld = new Loader();
-            List<List<Tuple<NDarray, NDarray>>> all_data = ld.load_data("../../pickledata.pkl.npy");
-
-            net.SGD(all_data[0], 30, 10, 10, 3.0, all_data[2]);
+            List<List<NDarray>> all_data = ld.load_data("../../pickledata.pkl.npy");
+            net.SGD(all_data[0], 30, 10, 3.0, all_data[2]);
 
            
         }
