@@ -23,8 +23,7 @@ namespace WindowsFormsApp3
             num_layers = sizes.Length;
             for (int i = 1; i < sizes.Length; i++)
             {
-                biases.Add(np.random.randn(new int[] { sizes[i], 1 }));
-                //Console.WriteLine(sizes[i - 1] + " " + sizes[i]);               
+                biases.Add(np.random.randn(new int[] { sizes[i], 1 }));              
             }
 
             for (int x = 0, y = 1; y < num_layers; x++, y++){
@@ -33,9 +32,7 @@ namespace WindowsFormsApp3
          
         }
 
-        private NDarray feedforward(NDarray a) { // a single value NDarray?
-
-            
+        private NDarray feedforward(NDarray a) {          
             for (int i = 0; i < weights.Count; i++) {
                 NDarray b = biases[i];
                 NDarray w = weights[i];
@@ -67,14 +64,11 @@ namespace WindowsFormsApp3
                 }
 
                 if (test_data != null)
-                {
-                    Console.WriteLine();
+                {                
                     Console.WriteLine("Epoch {0}: {1} / {2} complete", j, evaluate(test_data), test_data.Count);
-
                 }
                 else {
                     Console.WriteLine("Epoch {0} complete", j);
-
                 }
 
             }
@@ -90,8 +84,6 @@ namespace WindowsFormsApp3
                 temp.Add(test_data[i][1]);
                 test_results.Add(np.array(temp));             
             }
-
-
 
             double sum = 0;
             for (int i = 0; i < test_results.Count; i++) {
@@ -118,34 +110,15 @@ namespace WindowsFormsApp3
             for (int i = 0; i < weights.Count; i++) {
                 NDarray b = biases[i];
                 NDarray w = weights[i];
-                Console.WriteLine("W shape {0}", w.shape);
-                Console.WriteLine("Activation Shape {0}", activation.shape);
-                Console.WriteLine("B shape {0}", b.shape);
-                NDarray z = np.dot(w, activation) + b;
-                //Console.WriteLine(z.shape);
-               
+                NDarray z = np.dot(w, activation) + b;        
                 zs.Add(z);
                 activation = sigmoid(z);
-                //Console.WriteLine(activation.shape);
                 activations.Add(activation);
             }
 
-           // Console.WriteLine("y shape: {0}", y.shape);
-            //Console.WriteLine("activation shape: {0}", activations[activations.Count - 1].shape);
-            y = np.reshape(y, new int[] { 10, 1 });
-           // NDarray delta1 = cost_derivative(activations[activations.Count - 1], y);
-            //Console.WriteLine("Delta1 shape {0}", delta1.shape);
-            //NDarray delta2 = sigmoidPrime(zs[zs.Count - 1]);
-            //Console.WriteLine("Delta2 shape {0}", delta2.shape);
-
+            y = np.reshape(y, new int[] { 10, 1 });      
             NDarray delta = cost_derivative(activations[activations.Count-1], y) * sigmoidPrime(zs[zs.Count-1]);
-
-            //Console.WriteLine("Zs: {0}", zs[zs.Count - 1]);
-
-            nabla_b[nabla_b.Count-1] = delta;
-           // Console.WriteLine("Z shape {0}", zs[zs.Count - 1].shape);
-           // Console.WriteLine("Delta shape {0}", delta.shape);
-           // Console.WriteLine("Transposed activations {0}", np.transpose(activations[activations.Count - 2]).shape);
+            nabla_b[nabla_b.Count-1] = delta;         
             nabla_w[nabla_w.Count-1] = np.dot(delta, np.transpose(activations[activations.Count-2]));
 
             for (int l = 2; l < num_layers; l++) {
@@ -153,8 +126,6 @@ namespace WindowsFormsApp3
                 NDarray sp = sigmoidPrime(z);
                 delta = np.dot(np.transpose(weights[weights.Count - l + 1]), delta) * sp;
                 nabla_b[nabla_b.Count-l] = delta;
-               // Console.WriteLine("delta shape {0}", delta.shape);
-               // Console.WriteLine("tranposed activation shape {0}", np.transpose(np.reshape(activations[activations.Count - l - 1], new int[] {784, 1})).shape);
                 nabla_w[nabla_w.Count-l] = np.dot(delta, np.transpose(np.reshape(activations[activations.Count - l - 1], new int[] { 784, 1 })));
             }
             return (nabla_b, nabla_w);
@@ -169,52 +140,37 @@ namespace WindowsFormsApp3
         }
 
         private NDarray cost_derivative(NDarray output_activations, NDarray y) {
-            //y = np.reshape(y, output_activations.shape);
-            //Console.WriteLine(output_activations.shape);
-            //Console.WriteLine(y.shape);
             return (output_activations - y);
         }
 
         private void update_mini_batch(List<NDarray> mini_batch, double eta) {
-
-            //nabla_b = [np.zeros(b.shape) for b in self.biases]
             List<NDarray> nabla_b = new List<NDarray>();
            
             for (int i = 0; i < biases.Count; i++) {
                 nabla_b.Add(np.zeros(biases[i].shape));
             }
 
-            //nabla_w = [np.zeros(w.shape) for w in self.weights]
             List<NDarray> nabla_w = new List<NDarray>();
             for (int i = 0; i < weights.Count; i++) {
                 nabla_w.Add(np.zeros(weights[i].shape));
             }
 
-
-
             for (int i = 0; i < mini_batch.Count; i++) {              
                 (List<NDarray> delta_nabla_b, List<NDarray> delta_nabla_w) = backprop(mini_batch[i][0], mini_batch[i][1]);
-                List<NDarray> zip_delta_b = Util.zip(nabla_b, delta_nabla_b);
-                for (int j = 0; j < zip_delta_b.Count; j++) {
-                    nabla_b[j] = zip_delta_b[j][0] + zip_delta_b[j][1];
+                for (int j = 0; j < delta_nabla_b.Count; j++) {                   
+                    nabla_b[j] = nabla_b[j] + delta_nabla_b[j];
                 }
-                List<NDarray> zip_delta_w = Util.zip(nabla_w, delta_nabla_w);
-                for (int j = 0; j < zip_delta_w.Count; j++) {
-                    nabla_w[j] = zip_delta_w[j][0] + zip_delta_w[j][1];
+                for (int j = 0; j < delta_nabla_w.Count; j++) {
+                    nabla_w[j] = nabla_w[j] + delta_nabla_w[j];
                 }
             }
 
-            //self.weights = [w-(eta/len(mini_batch))*nw
-            //                    for w, nw in zip(self.weights, nabla_w)]
-            List<NDarray> temp = Util.zip(weights, nabla_w);
-            for (int i = 0; i < temp.Count; i++) {
-                weights[i]= temp[i][0] - (eta / mini_batch.Count)*temp[i][1];
+            for (int i = 0; i < weights.Count; i++) {
+                weights[i]= weights[i] - (eta / mini_batch.Count)*nabla_w[i];
             }
-
-            List<NDarray> temp2 = Util.zip(biases, nabla_b);
-
-            for (int i = 0; i < temp2.Count; i++) {
-                biases[i] = temp2[i][0] - (eta / mini_batch.Count) * temp2[i][1];
+            
+            for (int i = 0; i < biases.Count; i++) {
+                biases[i] = biases[i] - (eta / mini_batch.Count) * nabla_b[i];
             }
         }
 
@@ -222,7 +178,7 @@ namespace WindowsFormsApp3
             
             List<NDarray> mini_batch = new List<NDarray>();        
             for (int i = rangeFrom; i < rangeTo; i++) {
-                mini_batch.Add(training_data[i]);  //  pass in tuple            
+                mini_batch.Add(training_data[i]);           
             }
             
             return mini_batch;
