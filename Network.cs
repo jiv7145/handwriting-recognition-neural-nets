@@ -38,9 +38,11 @@ namespace WindowsFormsApp3
 
         private NDarray feedforward(NDarray a) { // a single value NDarray?
 
-            List<NDarray> zipped = Util.zip(biases, weights);
-            for (int i = 0; i < zipped.Count; i++) {
-                a = sigmoid(np.dot(zipped[i][1], a) + zipped[i][0]);
+            
+            for (int i = 0; i < weights.Count; i++) {
+                NDarray b = biases[i];
+                NDarray w = weights[i];
+                a = sigmoid(np.dot(w, a) + b);
             }
 
             return a;
@@ -117,41 +119,35 @@ namespace WindowsFormsApp3
 
            
             NDarray activation = x;
-            //Console.WriteLine("Before" + activation.size);
-           // Console.WriteLine(activation.shape);
-            activation = np.reshape(activation, new int[] {784, 1});
-            //Console.WriteLine(activation[0].size);
-            //Console.WriteLine(activation[0].shape);
-
+            //activation = np.reshape(activation, new int[] {784, 1});
             List<NDarray> activations = new List<NDarray>();
             activations.Add(x);
             List<NDarray> zs = new List<NDarray>();
-            Console.WriteLine(biases.Count);
-            Console.WriteLine(weights.Count);
-            List<NDarray> bw = Util.zip(biases, weights); // not getting the right shape here
+           
 
-            Console.WriteLine(biases[0].shape);
+            //Console.WriteLine(biases[0].shape);
             Console.WriteLine(weights[0].shape);
 
-            for (int i = 0; i < bw.Count; i++) {
-                Console.WriteLine(bw[i][1].shape);
-                NDarray z = np.dot(bw[i][1], activation) + bw[i][0]; 
+            for (int i = 0; i < weights.Count; i++) {
+                NDarray b = biases[i];
+                NDarray w = weights[i];
+                NDarray z = np.dot(w, activation) + b; 
                 zs.Add(z);
                 activation = sigmoid(z);
                 activations.Add(activation);
             }
 
-            NDarray delta = cost_derivative(activations[-1], y) * sigmoidPrime(zs[-1]); // this works?
+            NDarray delta = cost_derivative(activations[activations.Count-1], y) * sigmoidPrime(zs[zs.Count-1]); // this works?
 
-            nabla_b[-1] = delta;
-            nabla_w[-1] = np.dot(delta, activations[-2].transpose());
+            nabla_b[nabla_b.Count-1] = delta;
+            nabla_w[nabla_w.Count-1] = np.dot(delta, np.transpose(activations[activations.Count-2]));
 
             for (int l = 2; l < num_layers; l++) {
                 NDarray z = zs[zs.Count-l];
                 NDarray sp = sigmoidPrime(z);
                 delta = np.dot(weights[weights.Count - l + 1].transpose(), delta) * sp;
                 nabla_b[nabla_b.Count-l] = delta;
-                nabla_w[nabla_w.Count-l] = np.dot(delta, activations[activations.Count-l + 1].transpose());
+                nabla_w[nabla_w.Count-l] = np.dot(delta, np.transpose(activations[activations.Count-l + 1]));
             }
             return (nabla_b, nabla_w);
         }
@@ -165,7 +161,7 @@ namespace WindowsFormsApp3
         }
 
         private NDarray cost_derivative(NDarray output_activations, NDarray y) {
-
+            //y = np.reshape(y, output_activations.shape);
             return (output_activations - y);
         }
 
@@ -196,17 +192,12 @@ namespace WindowsFormsApp3
                 for (int j = 0; j < zip_delta_w.Count; j++) {
                     nabla_w[j] = zip_delta_w[j][0] + zip_delta_w[j][1];
                 }
-
             }
-
 
             //self.weights = [w-(eta/len(mini_batch))*nw
             //                    for w, nw in zip(self.weights, nabla_w)]
-
             List<NDarray> temp = Util.zip(weights, nabla_w);
             for (int i = 0; i < temp.Count; i++) {
-                //Console.WriteLine(temp[i][0].shape);
-                //Console.WriteLine(temp[i][1].shape);
                 weights[i]= temp[i][0] - (eta / mini_batch.Count)*temp[i][1];
             }
 
@@ -219,12 +210,11 @@ namespace WindowsFormsApp3
 
         private List<NDarray> ndarrayRange(List<NDarray> training_data, int rangeFrom, int rangeTo) {
             
-            List<NDarray> mini_batch = new List<NDarray>();
-            //Console.WriteLine("shape"+  darray[0].shape);          
+            List<NDarray> mini_batch = new List<NDarray>();        
             for (int i = rangeFrom; i < rangeTo; i++) {
                 mini_batch.Add(training_data[i]);  //  pass in tuple            
             }
-            //Console.WriteLine(darray);
+            
             return mini_batch;
         }
     }
