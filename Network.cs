@@ -87,7 +87,13 @@ namespace WindowsFormsApp3
 
             double sum = 0;
             for (int i = 0; i < test_results.Count; i++) {
-                sum += test_results[i][0] == test_results[i][1] ? 1 : 0;
+                //Console.WriteLine(test_results[i][0]);
+                //Console.WriteLine(test_results[i][1]);
+                if (np.array_equal(test_results[i][0], test_results[i][1])) {
+                    //Console.WriteLine("its the same!");
+                    sum++;
+                }
+                
             }
             return sum;
         }
