@@ -16,10 +16,7 @@ namespace WindowsFormsApp3
         int n; // learning rate?
 
         public Network(int[] sizes)
-        {
-            NDarray b = np.empty();
-            b = np.append(b, np.array(new int[] { 1, 2 }));
-            Console.WriteLine(b.shape);
+        {       
             biases = new List<NDarray>();
             weights = new List<NDarray>();
             this.sizes = sizes;
@@ -27,13 +24,13 @@ namespace WindowsFormsApp3
             for (int i = 1; i < sizes.Length; i++)
             {
                 biases.Add(np.random.randn(new int[] { sizes[i], 1 }));
-                Console.WriteLine(sizes[i - 1] + " " + sizes[i]);               
+                //Console.WriteLine(sizes[i - 1] + " " + sizes[i]);               
             }
 
             for (int x = 0, y = 1; y < num_layers; x++, y++){
                 weights.Add(np.random.randn(sizes[y], sizes[x]));
             }
-          
+         
         }
 
         private NDarray feedforward(NDarray a) { // a single value NDarray?
@@ -104,36 +101,32 @@ namespace WindowsFormsApp3
         }
 
         private (List<NDarray>, List<NDarray>) backprop(NDarray x, NDarray y) {
-
             List<NDarray> nabla_b = new List<NDarray>();
             List<NDarray> nabla_w = new List<NDarray>();
 
-            for (int i = 0; i < biases.Count; i++) {
+            for (int i = 0; i < biases.Count; i++) { // bias and weight count should be the same
                 nabla_b.Add(np.zeros(biases[i].shape));
-            }
-
-            for (int i = 0; i < weights.Count; i++)
-            {
                 nabla_w.Add(np.zeros(weights[i].shape));
             }
-
-           
+                      
             NDarray activation = x;
-            //activation = np.reshape(activation, new int[] {784, 1});
             List<NDarray> activations = new List<NDarray>();
+            activation = np.reshape(activation, new int[] { 784, 1 });
             activations.Add(x);
             List<NDarray> zs = new List<NDarray>();
-           
-
-            //Console.WriteLine(biases[0].shape);
-            Console.WriteLine(weights[0].shape);
 
             for (int i = 0; i < weights.Count; i++) {
                 NDarray b = biases[i];
                 NDarray w = weights[i];
-                NDarray z = np.dot(w, activation) + b; 
+                Console.WriteLine("W shape {0}", w.shape);
+                Console.WriteLine("Activation Shape {0}", activation.shape);
+                Console.WriteLine("B shape {0}", b.shape);
+                NDarray z = np.dot(w, activation) + b;
+                Console.WriteLine(z.shape);
+               
                 zs.Add(z);
                 activation = sigmoid(z);
+                //Console.WriteLine(activation.shape);
                 activations.Add(activation);
             }
 
@@ -162,6 +155,8 @@ namespace WindowsFormsApp3
 
         private NDarray cost_derivative(NDarray output_activations, NDarray y) {
             //y = np.reshape(y, output_activations.shape);
+            Console.WriteLine(output_activations.shape);
+            Console.WriteLine(y.shape);
             return (output_activations - y);
         }
 
