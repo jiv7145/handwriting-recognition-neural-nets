@@ -15,8 +15,11 @@ namespace WindowsFormsApp3
         List<NDarray> weights;
         int n; // learning rate?
 
-        public Network(int[] sizes)
-        {       
+        Form1 form;
+
+        public Network(int[] sizes, Form1 form1)
+        {
+            form = form1;
             biases = new List<NDarray>();
             weights = new List<NDarray>();
             this.sizes = sizes;
@@ -32,14 +35,12 @@ namespace WindowsFormsApp3
          
         }
 
-        private NDarray feedforward(NDarray a) {          
-            for (int i = 0; i < weights.Count; i++) {
-                NDarray b = biases[i];
-                NDarray w = weights[i];
-                a = sigmoid(np.dot(w, a) + b);
-            }
-
-            return a;
+        public string evaluate(double[] rgbDoubles) {
+            NDarray test_data = np.array(rgbDoubles);
+            test_data = np.reshape(test_data, new int[] { 784, 1 });
+            NDarray test_results = feedforward(test_data);
+            var x = np.argmax(test_results);
+            return x.str;
         }
 
         //training_data and test_data contains tuples of [ndarray, ndarray]
@@ -64,7 +65,11 @@ namespace WindowsFormsApp3
                 }
 
                 if (test_data != null)
-                {                
+                {
+                    //System.Windows.Forms.MessageBox.Show($"Epoch {j}: {evaluate(test_data)} / {test_data.Count} complete");
+                    string output = $"Epoch {j}: {evaluate(test_data)} / {test_data.Count}";
+                    form.updateTextBox(output);
+
                     Console.WriteLine("Epoch {0}: {1} / {2} complete", j, evaluate(test_data), test_data.Count);
                 }
                 else {
@@ -73,6 +78,20 @@ namespace WindowsFormsApp3
 
             }
 
+            form.updateTextBox("Learning Complete");
+            form.setLearned();
+
+        }
+        private NDarray feedforward(NDarray a)
+        {
+            for (int i = 0; i < weights.Count; i++)
+            {
+                NDarray b = biases[i];
+                NDarray w = weights[i];
+                a = sigmoid(np.dot(w, a) + b);
+            }
+
+            return a;
         }
 
         private double evaluate(List<NDarray> test_data) {
@@ -86,14 +105,10 @@ namespace WindowsFormsApp3
             }
 
             double sum = 0;
-            for (int i = 0; i < test_results.Count; i++) {
-                //Console.WriteLine(test_results[i][0]);
-                //Console.WriteLine(test_results[i][1]);
-                if (np.array_equal(test_results[i][0], test_results[i][1])) {
-                    //Console.WriteLine("its the same!");
+            for (int i = 0; i < test_results.Count; i++) {             
+                if (np.array_equal(test_results[i][0], test_results[i][1])) {                   
                     sum++;
-                }
-                
+                }              
             }
             return sum;
         }

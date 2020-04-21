@@ -49,7 +49,18 @@ namespace WindowsFormsApp3
             return data;
         }
 
-
+        public static bool isNum(string s)
+        {
+            if (!string.IsNullOrEmpty(s))
+            {
+                if (int.TryParse(s, out _))
+                {
+                    return true;
+                }
+            }
+            System.Windows.Forms.MessageBox.Show("Invalid input");
+            return false;
+        }
 
     }
 
